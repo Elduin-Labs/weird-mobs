@@ -1,6 +1,12 @@
 package com.elduin.weird_mobs.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerBossEvent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.BossEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
@@ -38,6 +44,19 @@ public class OkieEntity extends PathfinderMob {
 		"because", "school", "people", "little", "jump", "green", "diamond",
 		"pickaxe", "creeper", "village", "enough", "beautiful"
 	};
+
+	/** How close you have to be for its bar to show up, in blocks. */
+	private static final double BAR_RANGE = 24.0D;
+
+	/**
+	 * The bar across the top of the screen, like the Ender Dragon's. It says
+	 * OKIE and fills up with how much health it has left.
+	 */
+	private final ServerBossEvent bar = new ServerBossEvent(
+		Component.literal("OKIE"),
+		BossEvent.BossBarColor.BLUE,
+		BossEvent.BossBarOverlay.PROGRESS
+	);
 
 	/** Ticks left of the lesson currently being spelled out, 0 when idle. */
 	private int lessonTicks;
@@ -94,9 +113,39 @@ public class OkieEntity extends PathfinderMob {
 	@Override
 	public void tick() {
 		super.tick();
-		if (!this.level().isClientSide() && this.lessonTicks > 0) {
+		if (this.level().isClientSide()) {
+			return;
+		}
+		this.tickBar();
+		if (this.lessonTicks > 0) {
 			this.tickLesson();
 		}
+	}
+
+	/**
+	 * Keeps the bar filled to its health, and shows it to whoever is close
+	 * enough while hiding it from everyone who has walked away.
+	 */
+	private void tickBar() {
+		this.bar.setProgress(this.getHealth() / this.getMaxHealth());
+
+		List<ServerPlayer> nearby = this.level().getEntitiesOfClass(
+			ServerPlayer.class, this.getBoundingBox().inflate(BAR_RANGE));
+
+		for (ServerPlayer watching : new ArrayList<>(this.bar.getPlayers())) {
+			if (!nearby.contains(watching)) {
+				this.bar.removePlayer(watching);
+			}
+		}
+		for (ServerPlayer player : nearby) {
+			this.bar.addPlayer(player);
+		}
+	}
+
+	@Override
+	public void remove(RemovalReason reason) {
+		this.bar.removeAllPlayers();
+		super.remove(reason);
 	}
 
 	/** Spells the current word out one letter at a time, about twice a second. */
