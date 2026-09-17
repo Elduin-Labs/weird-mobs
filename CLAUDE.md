@@ -39,6 +39,13 @@ What he asked for, in his words:
   over both eyes and back up.
 - It **only teaches you how to spell.** He explicitly changed his mind about it
   attacking — the OKIE is friendly and must never be hostile.
+- It **spawns in the Deep Dark**, and has a **spawn egg** in the creative
+  Spawn Eggs tab.
+
+The Deep Dark is pitch black and vanilla spawns nothing there, so the spawn
+placement predicate deliberately skips the usual light-level check. It only asks
+for solid ground. Category is `CREATURE`, so they arrive with new chunks rather
+than trickling in — that keeps them friendly-feeling and off the monster cap.
 
 Model numbers from his Blockbench file, for keeping the code and the model in
 step:
