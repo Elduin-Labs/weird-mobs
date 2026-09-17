@@ -41,6 +41,11 @@ What he asked for, in his words:
   attacking — the OKIE is friendly and must never be hostile.
 - It **spawns in the Deep Dark**, and has a **spawn egg** in the creative
   Spawn Eggs tab.
+- It has a **boss bar** across the top of the screen saying OKIE, filled to its
+  health, shown to players within 24 blocks. He asked for "a bar that says
+  OKIE... with all the health. It has 10 Hearts" - 10 hearts is `MAX_HEALTH`
+  20.0, which it already had. He was offered a floating name tag instead and
+  picked the bar, so don't swap it back.
 
 The Deep Dark is pitch black and vanilla spawns nothing there, so the spawn
 placement predicate deliberately skips the usual light-level check. It only asks
