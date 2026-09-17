@@ -12,6 +12,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -19,6 +20,7 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 
 /**
@@ -44,6 +46,12 @@ public class OkieEntity extends PathfinderMob {
 		"because", "school", "people", "little", "jump", "green", "diamond",
 		"pickaxe", "creeper", "village", "enough", "beautiful"
 	};
+
+	/**
+	 * The sizes a debug stick cycles it through. Poking it walks down the list
+	 * and then wraps back to 1.0, so an OKIE can never be left stuck tiny.
+	 */
+	private static final double[] SIZES = {1.0D, 0.7D, 0.5D, 0.35D, 0.25D};
 
 	/** How close you have to be for its bar to show up, in blocks. */
 	private static final double BAR_RANGE = 24.0D;
@@ -96,7 +104,12 @@ public class OkieEntity extends PathfinderMob {
 
 	@Override
 	public InteractionResult mobInteract(Player player, InteractionHand hand) {
+		boolean debugStick = player.getItemInHand(hand).is(Items.DEBUG_STICK);
 		if (this.level().isClientSide()) {
+			return InteractionResult.SUCCESS;
+		}
+		if (debugStick) {
+			this.cycleSize(player);
 			return InteractionResult.SUCCESS;
 		}
 		if (this.lessonTicks > 0) {
@@ -168,6 +181,27 @@ public class OkieEntity extends PathfinderMob {
 			this.lessonWord = "";
 			this.lessonStudent = null;
 		}
+	}
+
+	/**
+	 * Steps it down to the next size, wrapping back to full size at the end.
+	 * The scale attribute takes the hitbox with it, so a tiny OKIE really is
+	 * tiny, not just drawn small.
+	 */
+	private void cycleSize(Player player) {
+		AttributeInstance scale = this.getAttribute(Attributes.SCALE);
+		if (scale == null) {
+			return;
+		}
+		int next = 0;
+		for (int i = 0; i < SIZES.length; i++) {
+			if (Math.abs(scale.getBaseValue() - SIZES[i]) < 0.01D) {
+				next = (i + 1) % SIZES.length;
+				break;
+			}
+		}
+		scale.setBaseValue(SIZES[next]);
+		this.say(player, next == 0 ? "big again!" : "eep! I am small!");
 	}
 
 	private void say(Player player, String message) {

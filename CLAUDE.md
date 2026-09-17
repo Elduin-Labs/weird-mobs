@@ -41,6 +41,11 @@ What he asked for, in his words:
   attacking — the OKIE is friendly and must never be hostile.
 - It **spawns in the Deep Dark**, and has a **spawn egg** in the creative
   Spawn Eggs tab.
+- Right-clicking it with a **debug stick** shrinks it, stepping 1.0 -> 0.7 ->
+  0.5 -> 0.35 -> 0.25 and wrapping back to full size, via the `SCALE` attribute
+  so the hitbox shrinks too. He described this as a glitch he had seen; it was
+  not one, but he liked the idea so it is a real feature now. The wrap-around
+  matters - an OKIE must never be left stuck tiny.
 - It has a **boss bar** across the top of the screen saying OKIE, filled to its
   health, shown to players within 24 blocks. He asked for "a bar that says
   OKIE... with all the health. It has 10 Hearts" - 10 hearts is `MAX_HEALTH`
