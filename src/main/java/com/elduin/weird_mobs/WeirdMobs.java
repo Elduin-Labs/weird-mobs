@@ -20,6 +20,7 @@ public class WeirdMobs {
 	public static void onInitialize() {
 		LOGGER.info("Initializing {} on {}", MOD_ID, WeirdMobs.xplat().loader());
 		ModEntities.register();
+		com.elduin.weird_mobs.item.ModItems.register();
 	}
 
 	public static void onInitializeClient() {

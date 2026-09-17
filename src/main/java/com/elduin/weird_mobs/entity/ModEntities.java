@@ -2,6 +2,8 @@ package com.elduin.weird_mobs.entity;
 
 import com.elduin.weird_mobs.WeirdMobs;
 
+import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -9,6 +11,10 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.SpawnPlacementTypes;
+import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.levelgen.Heightmap;
 
 public final class ModEntities {
 
@@ -34,5 +40,23 @@ public final class ModEntities {
 
 	public static void register() {
 		FabricDefaultAttributeRegistry.register(OKIE, OkieEntity.createAttributes());
+
+		// The Deep Dark is pitch black, so the usual "needs light" check would
+		// stop it ever spawning. It only needs somewhere solid to stand.
+		SpawnPlacements.register(
+			OKIE,
+			SpawnPlacementTypes.ON_GROUND,
+			Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+			(type, level, reason, pos, random) -> level.getBlockState(pos.below()).isSolid()
+		);
+
+		BiomeModifications.addSpawn(
+			BiomeSelectors.includeByKey(Biomes.DEEP_DARK),
+			MobCategory.CREATURE,
+			OKIE,
+			30,
+			1,
+			2
+		);
 	}
 }
