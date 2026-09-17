@@ -1,6 +1,6 @@
 package com.elduin.weird_mobs.mixin;
 
-import com.elduin.weird_mobs.ModTemplate;
+import com.elduin.weird_mobs.WeirdMobs;
 import dev.kikugie.fletching_table.annotation.MixinEnvironment;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,7 +14,7 @@ public class ExampleMixin {
 
 	@Inject(method = "loadLevel", at = @At("RETURN"))
 	private void afterLoadLevel(CallbackInfo ci) {
-		ModTemplate.LOGGER.info("Level Loaded!");
+		WeirdMobs.LOGGER.info("Level Loaded!");
 	}
 
 }

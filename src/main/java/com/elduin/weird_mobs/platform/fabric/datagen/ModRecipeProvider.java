@@ -2,7 +2,7 @@ package com.elduin.weird_mobs.platform.fabric.datagen;
 
 //? fabric && != 1.19.2 {
 
-import com.elduin.weird_mobs.ModTemplate;
+import com.elduin.weird_mobs.WeirdMobs;
 
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.minecraft.core.HolderLookup;
@@ -46,7 +46,7 @@ public class ModRecipeProvider extends FabricRecipeProvider {
 
 	@Override
 	public @NotNull String getName() {
-		return ModTemplate.MOD_ID + ":recipe_provider";
+		return WeirdMobs.MOD_ID + ":recipe_provider";
 	}
 
 	static class IntRecipeProvider extends RecipeProvider {
