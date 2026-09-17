@@ -110,11 +110,20 @@ jobs:
           [ -z "$jar" ] && { echo "::error::no jar for ${{ matrix.minecraft }}"; exit 1; }
           echo "path=$jar" >> "$GITHUB_OUTPUT"
 
+      # Done with the gh CLI rather than softprops/action-gh-release, which
+      # fails with "Error creating asset temp dir" now that the runner forces
+      # its Node 20 bundle onto Node 24. gh is preinstalled on the runner.
+      # Both matrix jobs race to create the release; whichever loses just gets
+      # "already exists", which is fine, and then uploads its own jar.
       - name: Attach it to the GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: ${{ steps.jar.outputs.path }}
-          body_path: CHANGELOG.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JAR: ${{ steps.jar.outputs.path }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file CHANGELOG.md || true
+          gh release upload "$GITHUB_REF_NAME" "$JAR" --clobber
 
       - name: Can we publish to Modrinth?
         id: check
