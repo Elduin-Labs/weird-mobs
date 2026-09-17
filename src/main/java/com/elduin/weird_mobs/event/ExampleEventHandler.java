@@ -1,6 +1,6 @@
-package com.example.modtemplate.event;
+package com.elduin.weird_mobs.event;
 
-import com.example.modtemplate.ModTemplate;
+import com.elduin.weird_mobs.ModTemplate;
 import net.minecraft.server.level.ServerPlayer;
 
 public class ExampleEventHandler {

@@ -1,6 +1,7 @@
-# <MOD_DISPLAY_NAME>
+# Weird Mobs
 
-<One plain sentence: what this mod does, in Elduin's words.>
+A mod full of weird mobs. The first one is the OKIE — a robot that teaches you
+how to spell.
 
 This file is read automatically whenever Claude Code is opened in this folder.
 Everything below is specific to this one mod. The general rules about how to
@@ -8,24 +9,50 @@ work with Elduin live in `~/.claude/CLAUDE.md`.
 
 ## Facts about this mod
 
-    mod id            <mod_id>              (underscores — never change this)
-    slug              <mod-slug>            (repo name and Modrinth slug)
-    package           <com.elduin.mod_id>
+    mod id            weird_mobs            (underscores — never change this)
+    slug              weird-mobs            (repo name and Modrinth slug)
+    package           com.elduin.weird_mobs
     loader            fabric                (only fabric — see below)
-    minecraft         <1.21.11, 26.2>
-    primary version   <1.21.11>             (the one he plays)
-    java              21 for 1.21.x, 25 for 26.x — Gradle picks this per version
+    minecraft         1.21.8, 1.21.4
+    primary version   1.21.8                (the one he plays)
+    java              21 for both — Gradle picks this per version
+
+Elduin chose 1.21.8 and 1.21.4 himself. They are **not** the org's
+`DEFAULT_VERSIONS`, so don't "correct" them to 1.21.11 / 26.2.
 
 The mod id is baked into save files. Once a world has been played with this mod,
 **changing the mod id breaks that world.** Rename the display name freely;
 never rename the mod id.
+
+## The mobs
+
+### OKIE
+
+Elduin modelled this one himself in Blockbench. It is a tall flat panel — a
+light blue face with two pink eyes and a red zigzag across it.
+
+What he asked for, in his words:
+
+- It **moves by low legs that you can't see.** So: no leg geometry, and it
+  glides along the ground rather than doing a walk cycle.
+- It **blinks.** There is an eyelid box hinged at its top edge that swings down
+  over both eyes and back up.
+- It **only teaches you how to spell.** He explicitly changed his mind about it
+  attacking — the OKIE is friendly and must never be hostile.
+
+Model numbers from his Blockbench file, for keeping the code and the model in
+step:
+
+    body     position (-18, -12, -11)  size (19, 35, 46)
+    eyelid   position (-11,  12, -12)  size ( 8,  5,  1)
+             bone pivot (-7, 17, -11)  — hinged at the eyelid's top edge
 
 ## Layout
 
 Multi-version is handled by [Stonecutter](https://plugins.gradle.org/plugin/dev.kikugie.stonecutter):
 one source tree, version-conditional comments, many outputs.
 
-    src/main/java/<package>/                the mod
+    src/main/java/com/elduin/weird_mobs/    the mod
     src/main/resources/                     assets, textures, mixins, lang
     versions/<mcversion>-fabric/build/libs/ built jars land here
     stonecutter.properties.toml             mod id, name, version, dependencies
@@ -37,13 +64,21 @@ There is **no `fabric.mod.json` file** — it is generated at build time from
 metadata means editing the `.toml`, not a json file. Same for `mod.version`:
 there is no `mod_version` in `gradle.properties`.
 
-Stonecutter subprojects are named `<mcversion>-fabric`, so the 1.21.11 jar is in
-`versions/1.21.11-fabric/build/libs/`. That `-fabric` suffix is easy to forget.
+Stonecutter subprojects are named `<mcversion>-fabric`, so the 1.21.8 jar is in
+`versions/1.21.8-fabric/build/libs/`. That `-fabric` suffix is easy to forget.
 
 Do **not** add a branch or a repo for a new Minecraft version. Add it to the
 list in `settings.gradle.kts`, add a matching `[fabric."<version>"]` block in
 `stonecutter.properties.toml`, add it to the matrix in
 `.github/workflows/release.yml`, and fix whatever stops compiling.
+
+### Mappings across versions
+
+`build.fabric.gradle.kts` rewrites `ResourceLocation` to `Identifier` (and
+`location()` to `identifier()`) for 1.21.11 and up. Both versions in this mod
+are below that, so **write `ResourceLocation` in the shared sources.** If the
+tree ever looks like it uses `Identifier`, the sources are sitting in a newer
+version's form and want switching back.
 
 ## Fabric only
 
@@ -57,10 +92,10 @@ will exhaust memory and take the whole machine down.
 
 ## Commands
 
-    ./gradlew "Set active project to 1.21.11-fabric"   switch versions first
-    ./gradlew "1.21.11-fabric:build"                   build just that version
-    ./gradlew build                                    build every version
-    ./gradlew runActiveClient                          launch a dev client
+    ./gradlew "Set active project to 1.21.8-fabric"   switch versions first
+    ./gradlew "1.21.8-fabric:build"                   build just that version
+    ./gradlew build                                   build every version
+    ./gradlew runActiveClient                         launch a dev client
 
 Switching rewrites the shared source tree into that version's form. It is **not**
 required before building — each version subproject regenerates its own sources,
@@ -72,23 +107,36 @@ sources are currently in, and editing that file behind its back desyncs the
 bookkeeping — you get `cannot find symbol` errors on classes that plainly exist.
 Use the task above and nothing else.
 
+**If the active version is one you just deleted from `settings.gradle.kts`,**
+Gradle refuses to configure at all — "Version 'x' is not registered" — so you
+cannot run the switch task to get out of it. Put the old version back in
+`settings.gradle.kts` and `stonecutter.properties.toml` temporarily, run the
+switch task, then take it out again. Still don't edit `.sc_active_version`.
+
+## This machine's Xcode license
+
+`git`, `python3` and `curl` on this Mac are Xcode shims, and as of 2026-09-17
+they refuse to run with "You have not agreed to the Xcode license agreements."
+Prefix commands with `DEVELOPER_DIR=/Library/Developer/CommandLineTools` to use
+the standalone command line tools instead. The real fix needs a grown-up to run
+`sudo xcodebuild -license` once.
+
 ## Access wideners
 
 Optional and absent by default. If you need one, create
 `src/main/resources/aw/<mcversion>.accesswidener` and Loom picks it up
 automatically; without the file the step is skipped entirely. An *empty*
-placeholder file does not work — it fails the build on 1.21.11+.
+placeholder file does not work.
 
 ## Conventions for this repo
 
 - Textures are 16x16 unless there's a reason. Keep the pixel-art style consistent
   with the rest of the mod.
 - Every new block, item and mob needs an entry in the language file
-  (`assets/<mod_id>/lang/en_us.json`) or it shows up in-game as a raw id, which
+  (`assets/weird_mobs/lang/en_us.json`) or it shows up in-game as a raw id, which
   reads to him as "broken".
 - Anything a player can tune goes in the config, not hardcoded.
-- Keep it dependency-free where possible. If a library is genuinely needed, it
-  has to be one that's available for every Minecraft version in the list above.
+- Keep it dependency-free. Fabric API only.
 
 ## Releasing
 

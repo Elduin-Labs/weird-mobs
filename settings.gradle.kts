@@ -32,9 +32,9 @@ stonecutter {
 		fun fabric(version: String) =
 			version("$version-fabric", version).apply { buildscript = "build.fabric.gradle.kts" }
 
-		fabric("26.2")
-		fabric("1.21.11")
+		fabric("1.21.8")
+		fabric("1.21.4")
 
-		vcsVersion = "1.21.11-fabric"
+		vcsVersion = "1.21.8-fabric"
 	}
 }

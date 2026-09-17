@@ -1,6 +1,6 @@
-package com.example.modtemplate.mixin;
+package com.elduin.weird_mobs.mixin;
 
-import com.example.modtemplate.ModTemplate;
+import com.elduin.weird_mobs.ModTemplate;
 import dev.kikugie.fletching_table.annotation.MixinEnvironment;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;

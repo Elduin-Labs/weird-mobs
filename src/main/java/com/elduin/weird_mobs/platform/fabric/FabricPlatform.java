@@ -1,8 +1,8 @@
-package com.example.modtemplate.platform.fabric;
+package com.elduin.weird_mobs.platform.fabric;
 
 //? fabric {
 
-import com.example.modtemplate.platform.Platform;
+import com.elduin.weird_mobs.platform.Platform;
 import net.fabricmc.loader.api.FabricLoader;
 
 public class FabricPlatform implements Platform {
