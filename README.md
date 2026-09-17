@@ -1,3 +1,5 @@
+<img src="src/main/resources/assets/icon.png" width="128" align="right">
+
 # Weird Mobs
 
 A mod full of weird mobs.
